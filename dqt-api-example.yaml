@@ -1,0 +1,100 @@
+openapi: 3.0.0
+info:
+  title: 'DQT API for ECF'
+  description: 'This is the first stab at a DQT API for ECF'
+  version: '0.1'
+
+
+paths:
+  /teachers:
+    get:
+     description: Get collection of teachers
+     parameters:
+      - name: trns
+        in: query
+        required: true
+        schema: 
+          type: array
+          items: 
+            type: integer
+     responses:
+      '200':
+        description: Successfully return a collection teachers matching the TRNs 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Teachers'
+      '401':
+        $ref: '#/components/responses/UnauthorisedRequest'      
+  /teachers/{trn}/{dob}:
+    get:
+     description: Get a single teacher that matches the given TRN and DOB parameters
+     parameters:
+      - name: trn
+        in: path
+        required: true
+        schema: 
+          type: string
+      - name: dob
+        in: path
+        required: true
+        schema:
+          type: string
+          format: date
+     responses:
+      '200':
+        description: Successfully return 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Teacher'
+      '401':
+        $ref: '#/components/responses/UnauthorisedRequest'
+      '404':
+        $ref: '#/components/responses/NotFound'
+
+
+
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+  schemas:
+    Teacher:
+      type: object
+      required:
+        - trn
+        - dob
+      properties:
+        trn:
+          type: integer
+        first_name:
+          type: string
+        last_name:
+            type: string
+        qts_status:
+            type: string
+        induction_start_date:
+          type: string
+          format: date
+        induction_end_date:
+          type: string
+          format: date
+        dob:
+          type: string
+          format: date
+    Teachers:
+      type: array
+      items: 
+        $ref: '#/components/schemas/Teacher'
+        
+  responses:
+    UnauthorisedRequest:
+      description: 'Bearer token invalid or expired'
+    NotFound:
+      description: 'Resource not found matching those request parameters'
+
+
